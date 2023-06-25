@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ChatGPT Demo</title>
+    <style>
+      /* CSS styles for the chat conversation */
+      .user {
+        color: blue;
+      }
+      .assistant {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chat-container"></div>
+    <input type="text" id="user-input" />
+    <button onclick="handleUserInput()">Send</button>
+
+    <script>
+      const apiKey = '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';
+
+      async function sendMessage(message) {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            'model': 'text-davinci-003',
+            'messages': [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': message}]
+          })
+        });
+
+        const data = await response.json();
+        return data.choices[0].message.content;
+      }
+
+      function addMessageToChat(message, role) {
+        const chatContainer = document.getElementById('chat-container');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add(role);
+        messageElement.textContent = message;
+        chatContainer.appendChild(messageElement);
+      }
+
+      async function handleUserInput() {
+        const userInput = document.getElementById('user-input').value;
+        addMessageToChat(userInput, 'user');
+
+        const response = await sendMessage(userInput);
+        addMessageToChat(response, 'assistant');
+
+        // Clear user input
+        document.getElementById('user-input').value = '';
+      }
+    </script>
+  </body>
+</html>
